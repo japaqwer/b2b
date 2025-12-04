@@ -1,0 +1,22 @@
+.one {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  h1 {
+    font-family: "Nunito", sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 130%;
+    text-align: center;
+    color: #333333;
+  }
+}
+@media screen and (max-width: 700px) {
+  .one {
+    h1 {
+      font-size: 28px;
+    }
+  }
+}

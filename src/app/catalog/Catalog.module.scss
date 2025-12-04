@@ -1,0 +1,327 @@
+// Catalog.module.scss
+
+// ===== ПЕРЕМЕННЫЕ =====
+$primary-orange: #ff9922;
+$primary-orange-dark: #ff8800;
+$primary-green: #009a3b;
+$primary-green-dark: #008229;
+
+$gradient-orange: linear-gradient(135deg, #ff9922 0%, #ff8800 100%);
+$gradient-green: linear-gradient(180deg, #009a3b 0%, #008229 100%);
+
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+$shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+
+$text-primary: #333;
+$text-secondary: #666;
+$text-light: #999;
+$bg-light: #f8f9fa;
+$border-color: #e0e0e0;
+
+@mixin smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// ===== ОСНОВНОЙ КОНТЕЙНЕР =====
+.main {
+  @include flex-column;
+  gap: 32px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, $bg-light 0%, #fff 100%);
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    gap: 24px;
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 16px;
+    padding: 16px 12px;
+  }
+}
+
+.layout {
+  @include flex-column;
+  gap: 32px;
+  width: 1020px;
+  max-width: 100%;
+  margin: 0 auto;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    gap: 20px;
+  }
+}
+
+// ===== ЗАГОЛОВОК =====
+.h1 {
+  font-family: "Nunito", sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 24px 0;
+  background: linear-gradient(135deg, #ff9922 0%, #667eea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeInDown 0.6s ease-out;
+
+  @media (max-width: 768px) {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+}
+
+// ===== КОЛОНКА СПИСКА =====
+.colum {
+  @include flex-column;
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @media (max-width: 768px) {
+    gap: 12px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 10px;
+  }
+
+  li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// ===== КНОПКА ССЫЛКА =====
+.link {
+  @include smooth-transition;
+  padding: 16px 24px;
+  background: #fff;
+  border: 2px solid $border-color;
+  border-radius: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+
+  p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-primary;
+    font-family: "Nunito", sans-serif;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: $gradient-orange;
+    z-index: -1;
+    @include smooth-transition;
+  }
+
+  &:hover {
+    border-color: $primary-orange;
+    box-shadow: $shadow-hover;
+    transform: translateX(8px);
+
+    &::before {
+      left: 0;
+    }
+
+    p {
+      color: #fff;
+    }
+
+    &::after {
+      content: "→";
+      margin-left: 12px;
+      opacity: 1;
+    }
+  }
+
+  &::after {
+    content: "";
+    opacity: 0;
+    @include smooth-transition;
+  }
+
+  @media (max-width: 768px) {
+    padding: 14px 20px;
+
+    p {
+      font-size: 15px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px 16px;
+
+    p {
+      font-size: 14px;
+    }
+  }
+}
+
+// ===== ЗАГРУЗКА =====
+.loading {
+  @include flex-center;
+  min-height: 400px;
+  gap: 20px;
+  flex-direction: column;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 153, 34, 0.2);
+    border-top-color: $primary-orange;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    color: $text-secondary;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+// ===== ПУСТАЯ СТРАНИЦА =====
+.empty {
+  @include flex-center;
+  min-height: 400px;
+  justify-content: center;
+  margin: 40px 0;
+
+  img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    animation: fadeInScale 0.6s ease-out;
+  }
+
+  @media (max-width: 480px) {
+    min-height: 300px;
+    margin: 24px 0;
+
+    img {
+      max-width: 200px;
+    }
+  }
+}
+
+// ===== ОШИБКА =====
+.error {
+  @include flex-center;
+  min-height: 400px;
+  flex-direction: column;
+  gap: 20px;
+  background: rgba(255, 51, 51, 0.05);
+  border-radius: 12px;
+  padding: 40px;
+  border: 2px solid rgba(255, 51, 51, 0.2);
+
+  p {
+    color: #ff3333;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  @media (max-width: 480px) {
+    padding: 24px;
+    min-height: 300px;
+
+    p {
+      font-size: 16px;
+    }
+  }
+}
+
+// ===== АНИМАЦИИ =====
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// ===== УТИЛИТЫ =====
+.hidden {
+  display: none !important;
+}
+
+.noSelect {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.textCenter {
+  text-align: center;
+}

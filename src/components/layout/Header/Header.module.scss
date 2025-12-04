@@ -1,0 +1,662 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 80px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+  h2 {
+    margin-top: -20px;
+    text-align: center;
+    font-size: 18px;
+    color: #ff7700;
+  }
+}
+
+.flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 105px;
+}
+
+.logo {
+  width: 240px;
+  height: auto;
+}
+
+.mobileMenuBtn {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  margin-right: 20px;
+
+  span {
+    width: 32px;
+    height: 3px;
+    background: #ff9922;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+}
+
+.nav {
+  display: flex;
+  gap: 0;
+  flex: 1;
+  align-items: center;
+}
+
+.navItem {
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+.navLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    color: #ff9922;
+  }
+}
+
+.chevron {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  z-index: 1000;
+  padding: 8px 0;
+  animation: slideDown 0.2s ease-out;
+  min-width: 250px;
+  padding-top: 16px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 16px;
+    background: transparent;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.submenuItemWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background: #f8f8f8;
+  }
+}
+
+.submenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 16px;
+  font-family: "Nunito", sans-serif;
+  font-size: 13px;
+  color: #555;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    color: #ff9922;
+    padding-left: 20px;
+  }
+}
+
+.arrow {
+  font-size: 16px;
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+}
+
+.undersubmenu {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-left: 4px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 1100;
+  padding: 8px 0;
+  animation: slideRight 0.2s ease-out;
+  margin-right: -12px;
+  padding-right: 12px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    right: -12px;
+    top: 0;
+    width: 12px;
+    height: 100%;
+    background: transparent;
+  }
+}
+
+.undersubmenuItem {
+  display: block;
+  padding: 10px 16px;
+  font-family: "Nunito", sans-serif;
+  font-size: 12px;
+  color: #555;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: #f5f5f5;
+    color: #ff9922;
+    padding-left: 20px;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.favoritesBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(180deg, #009a3b 0%, #008229 100%);
+  border: none;
+  border-radius: 24px;
+  padding: 10px 16px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+
+  &:hover {
+    color: #008229;
+    border: 1px solid #009a3b;
+    background: #fff;
+  }
+}
+
+.badge {
+  background: #ff9800;
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+}
+
+// ===== MOBILE MENU STYLES =====
+.mobileMenuOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.mobileMenuDrawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #fff;
+  z-index: 1001;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+
+  &.open {
+    transform: translateX(0);
+  }
+}
+
+.mobileMenuHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 60px;
+}
+
+.mobileBackBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff9922;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileMenuTitle {
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+  text-align: center;
+  flex: 1;
+}
+
+.mobileCloseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff9922;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileMenuContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.mobileMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 12px;
+
+  &:active {
+    background: #f5f5f5;
+  }
+}
+
+.mobileMenuItemText {
+  display: block;
+  font-family: "Nunito", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+  flex: 1;
+  transition: color 0.2s ease;
+
+  &:active {
+    color: #ff9922;
+  }
+}
+
+.mobileMenuArrow {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff9922;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// ===== FAVORITES DRAWER STYLES =====
+.favoritesOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.favoritesDrawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background: #fff;
+  z-index: 1002;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+
+  &.open {
+    transform: translateX(0);
+  }
+}
+
+.favoritesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 60px;
+
+  h2 {
+    font-family: "Nunito", sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.favoritesCloseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff9922;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.favoritesList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  color: #999;
+
+  p {
+    font-family: "Nunito", sans-serif;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.favoriteItem {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f0f0f0;
+  }
+
+  img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+}
+
+.favoriteInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+
+  h3 {
+    font-family: "Nunito", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.3;
+  }
+
+  p {
+    font-family: "Nunito", sans-serif;
+    font-size: 11px;
+    color: #999;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.favoriteActions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.favoriteCreateBtn {
+  flex: 1;
+  padding: 6px 8px;
+  background: linear-gradient(180deg, #ff9922 0%, #ff8800 100%);
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  font-family: "Nunito", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+
+  &:hover {
+    background: linear-gradient(180deg, #ff8800 0%, #ff7700 100%);
+  }
+}
+
+.favoriteRemoveBtn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 51, 51, 0.1);
+  color: #ff3333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 51, 51, 0.2);
+  }
+}
+
+// ===== RESPONSIVE =====
+@media (max-width: 1200px) {
+  .header {
+    padding: 15px 40px;
+  }
+
+  .navLabel {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .actions {
+    display: none;
+  }
+
+  .header {
+    padding: 12px 20px;
+  }
+
+  .mobileMenuBtn {
+    display: flex;
+  }
+
+  .logo {
+    width: 150px;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .favoritesBtn {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .favoritesDrawer {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 10px 16px;
+  }
+
+  .logo {
+    width: 120px;
+  }
+
+  .mobileMenuDrawer {
+    width: 100%;
+  }
+
+  .mobileMenuHeader {
+    padding: 12px 16px;
+  }
+
+  .mobileMenuItem {
+    padding: 14px 16px;
+  }
+
+  .mobileMenuItemText {
+    font-size: 15px;
+  }
+
+  .favoritesHeader {
+    padding: 12px 16px;
+
+    h2 {
+      font-size: 16px;
+    }
+  }
+
+  .favoritesList {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .favoriteItem {
+    padding: 10px;
+
+    img {
+      width: 70px;
+      height: 70px;
+    }
+  }
+
+  .favoriteCreateBtn {
+    font-size: 10px;
+  }
+
+  .favoriteRemoveBtn {
+    width: 28px;
+    height: 28px;
+  }
+}

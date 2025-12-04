@@ -1,0 +1,23 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  .colum {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  li {
+    list-style: none;
+  }
+}
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 1020px;
+  max-width: 100%;
+  margin: 0 auto;
+}
