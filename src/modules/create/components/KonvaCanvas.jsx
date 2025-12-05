@@ -17,14 +17,61 @@ export default function KonvaCanvas({
 }) {
   const [loadedBgImage, setLoadedBgImage] = useState(null);
   const [loadedCoverImage, setLoadedCoverImage] = useState(null);
+  const [stageDimensions, setStageDimensions] = useState({
+    width: 640,
+    height: 360,
+  });
 
   const lastCenter = useRef(null);
   const lastDist = useRef(0);
   const isPinching = useRef(false);
 
-  // Новые размеры для 16:9
-  const STAGE_WIDTH = 640;
-  const STAGE_HEIGHT = 360;
+  // Функция для расчета размеров Stage
+  const calculateStageDimensions = () => {
+    if (typeof window === "undefined") return { width: 640, height: 360 };
+
+    const windowWidth = window.innerWidth;
+
+    if (windowWidth <= 500) {
+      // Мобильные устройства (до 500px)
+      const width = Math.min(windowWidth - 40, 640);
+      const height = (width * 9) / 16;
+      return { width: Math.round(width), height: Math.round(height) };
+    } else if (windowWidth <= 768) {
+      // Планшеты
+      const width = Math.min(windowWidth - 60, 640);
+      const height = (width * 9) / 16;
+      return { width: Math.round(width), height: Math.round(height) };
+    } else {
+      // Десктоп (> 768px) - стандартные размеры
+      return { width: 640, height: 360 };
+    }
+  };
+
+  // Обновляем размеры при монтировании и изменении размера окна
+  useEffect(() => {
+    const updateDimensions = () => {
+      const dimensions = calculateStageDimensions();
+      setStageDimensions(dimensions);
+    };
+
+    // Устанавливаем начальные размеры
+    updateDimensions();
+
+    // Добавляем слушатель изменения размера окна с debounce
+    let timeoutId;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(updateDimensions, 150);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   // Загружаем фоновую картинку из URL
   useEffect(() => {
@@ -64,8 +111,9 @@ export default function KonvaCanvas({
     img.src = coverImage;
   }, [coverImage]);
 
+  // Позиционируем пользовательское изображение
   useEffect(() => {
-    if (userImage && imageRef.current) {
+    if (userImage && imageRef.current && stageRef.current) {
       const stage = stageRef.current;
       const stageWidth = stage.width();
       const stageHeight = stage.height();
@@ -92,7 +140,7 @@ export default function KonvaCanvas({
 
       stage.batchDraw();
     }
-  }, [userImage, stageRef, imageRef]);
+  }, [userImage, stageDimensions, stageRef, imageRef]);
 
   const handleStageClick = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
@@ -225,8 +273,8 @@ export default function KonvaCanvas({
   return (
     <Stage
       ref={stageRef}
-      width={STAGE_WIDTH}
-      height={STAGE_HEIGHT}
+      width={stageDimensions.width}
+      height={stageDimensions.height}
       onMouseDown={handleStageClick}
       onTouchStart={handleTouchStart}
       onWheel={handleWheel}
@@ -248,8 +296,8 @@ export default function KonvaCanvas({
         {loadedBgImage && (
           <Image
             image={loadedBgImage}
-            width={STAGE_WIDTH}
-            height={STAGE_HEIGHT}
+            width={stageDimensions.width}
+            height={stageDimensions.height}
             listening={false}
             perfectDrawEnabled={false}
           />
@@ -278,8 +326,8 @@ export default function KonvaCanvas({
         {shouldRenderCover && loadedCoverImage && (
           <Image
             image={loadedCoverImage}
-            width={STAGE_WIDTH}
-            height={STAGE_HEIGHT}
+            width={stageDimensions.width}
+            height={stageDimensions.height}
             listening={false}
             perfectDrawEnabled={false}
           />

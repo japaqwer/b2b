@@ -2,10 +2,9 @@ import { useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 const STEP_MAP = {
-  PromoStep: 0,
-  SplashStep: 1,
-  EditStep: 2,
-  PreviewStep: 3,
+  SplashStep: 0,
+  EditStep: 1,
+  PreviewStep: 2,
 };
 
 const STEP_NAMES = Object.entries(STEP_MAP).reduce(
@@ -22,7 +21,7 @@ export function useStepNavigation() {
   const setStep = useCallback(
     (newStep) => {
       _setStep(newStep);
-      const name = STEP_NAMES[newStep] || "WelcomeStep";
+      const name = STEP_NAMES[newStep] || "SplashStep";
       router.replace(`?step=${encodeURIComponent(name)}`, { scroll: false });
     },
     [router]

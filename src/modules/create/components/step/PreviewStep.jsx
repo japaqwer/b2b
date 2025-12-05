@@ -89,7 +89,7 @@ export default function PreviewStep({
 
   // Обработчик для кнопки "Добавить фото"
   const handleAddPhoto = () => {
-    setStep(2);
+    setStep(1);
     // fileInputRef.current?.click();
   };
 
