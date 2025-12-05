@@ -19,6 +19,10 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
   const transformerRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  // Целевое разрешение для экспорта (1920x1080 - Full HD)
+  const EXPORT_WIDTH = 1920;
+  const EXPORT_HEIGHT = 1080;
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -70,25 +74,30 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     try {
-      const stageWidth = stageRef.current.width();
-      const stageHeight = stageRef.current.height();
+      const stage = stageRef.current;
+      const currentWidth = stage.width();
+      const currentHeight = stage.height();
 
-      // Создаем финальный canvas с белым фоном
+      // Вычисляем масштаб для экспорта в 1920x1080
+      const scaleX = EXPORT_WIDTH / currentWidth;
+      const scaleY = EXPORT_HEIGHT / currentHeight;
+
+      // Создаем финальный canvas с разрешением 1920x1080
       const finalCanvas = document.createElement("canvas");
-      finalCanvas.width = stageWidth * 2; // pixelRatio 2
-      finalCanvas.height = stageHeight * 2;
+      finalCanvas.width = EXPORT_WIDTH;
+      finalCanvas.height = EXPORT_HEIGHT;
 
       const finalCtx = finalCanvas.getContext("2d");
 
-      // Заполняем белым фоном сразу
+      // Заполняем белым фоном
       finalCtx.fillStyle = "#FFFFFF";
-      finalCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+      finalCtx.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
 
-      // Масштабируем для pixelRatio
-      finalCtx.scale(2, 2);
+      // Масштабируем контекст для высокого качества
+      finalCtx.scale(scaleX, scaleY);
 
-      // Рисуем все слои на белый фон
-      const layers = stageRef.current.getLayers();
+      // Рисуем все слои
+      const layers = stage.getLayers();
       layers.forEach((layer) => {
         const layerCanvas = layer.getCanvas();
         if (layerCanvas && layerCanvas._canvas) {
@@ -96,13 +105,14 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
             layerCanvas._canvas,
             0,
             0,
-            stageWidth,
-            stageHeight
+            currentWidth,
+            currentHeight
           );
         }
       });
 
-      const dataUrl = finalCanvas.toDataURL("image/png");
+      // Экспортируем в PNG с максимальным качеством
+      const dataUrl = finalCanvas.toDataURL("image/png", 1.0);
 
       setIsExporting(false);
       return dataUrl;
@@ -188,9 +198,14 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
       />
 
       <div className="center" style={{ marginTop: 10 }}>
-        <h4 className={s.h6} style={{ textAlign: "center" }}>
+        <h4 className={s.h7} style={{ textAlign: "center" }}>
           Измените размер фото и его положение привычными движениями пальцев
         </h4>
+        <h4 className={s.h8} style={{ textAlign: "center" }}>
+          Измените размер фото и его положение в рамке открытки привычными
+          движениями мышки
+        </h4>
+
         <div className={s.flex} style={{ gap: 20 }}>
           {!userImage && (
             <button className="button" onClick={handleAddPhoto}>

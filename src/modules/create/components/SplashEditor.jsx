@@ -11,7 +11,6 @@ export function SplashEditor({ template, onCreate }) {
   const textRef = useRef(null);
   const measureContext = useRef(null);
 
-  // Новые размеры для 16:9
   const CANVAS_WIDTH = 640;
   const CANVAS_HEIGHT = 360;
 
@@ -26,32 +25,45 @@ export function SplashEditor({ template, onCreate }) {
     measureContext.current = document.createElement("canvas").getContext("2d");
 
     if (template.title) {
-      const wrap = wrapperRef.current;
-      const fs = 32;
-      const { width, height } = measureTextSize(`${template.title}`, fs);
-      const id = Date.now();
-      setTexts([
-        {
-          id,
-          text: `${template.title}`,
-          x: (wrap.clientWidth - width) / 2,
-          y: (wrap.clientHeight - height) / 2,
-          fontSize: fs,
-          width,
-          height,
-        },
-      ]);
-      setEditingTextId(id);
+      setTimeout(() => {
+        if (wrapperRef.current) {
+          const wrap = wrapperRef.current;
+          const fs = 32;
+          const { width, height } = measureTextSize(`${template.title}`, fs);
+          const id = Date.now();
+          setTexts([
+            {
+              id,
+              text: `${template.title}`,
+              x: (wrap.clientWidth - width) / 2,
+              y: (wrap.clientHeight - height) / 2,
+              fontSize: fs,
+              width,
+              height,
+            },
+          ]);
+          setEditingTextId(id);
+        }
+      }, 100);
     }
   }, [template.title]);
 
   const measureTextSize = (text, fontSize) => {
     const ctx = measureContext.current;
-    ctx.font = `bold ${fontSize}px sans-serif`;
+    // Используем шрифт Arco как в стилях
+    ctx.font = `700 ${fontSize}px Arco, sans-serif`;
+
     const lines = text.split("\n");
-    const widths = lines.map((line) => ctx.measureText(line).width + 16);
-    const maxWidth = Math.max(...widths);
-    const height = fontSize * lines.length + 8 * lines.length;
+    const lineHeight = 38; // Из .textspan
+
+    const widths = lines.map((line) => {
+      const measured = ctx.measureText(line || " ");
+      return measured.width + 32;
+    });
+
+    const maxWidth = Math.max(...widths, 120);
+    const height = lineHeight * lines.length + 24;
+
     return { width: maxWidth, height };
   };
 
@@ -59,9 +71,11 @@ export function SplashEditor({ template, onCreate }) {
     const val = e.target.value;
     setEditingTextValue(val);
 
+    if (!wrapperRef.current) return;
+
     const wrap = wrapperRef.current;
     const fs = 32;
-    const { width, height } = measureTextSize(val, fs);
+    const { width, height } = measureTextSize(val || " ", fs);
 
     if (editingTextId == null) {
       const id = Date.now();
@@ -100,7 +114,9 @@ export function SplashEditor({ template, onCreate }) {
     const canvas = await html2canvas(textRef.current, {
       useCORS: true,
       backgroundColor: null,
-      scale: 3,
+      scale: 5,
+      logging: false,
+      allowTaint: true,
     });
     return canvas.toDataURL("image/png");
   };
@@ -124,7 +140,6 @@ export function SplashEditor({ template, onCreate }) {
     if (dataUrl) {
       try {
         const formData = new FormData();
-
         const introFile = dataURLtoFile(dataUrl, "intro.png");
         formData.append("intro", introFile);
 
@@ -136,7 +151,6 @@ export function SplashEditor({ template, onCreate }) {
 
         const uploadedIntro = response.data.data.intro_file_name;
         localStorage.setItem("uploadedIntro", JSON.stringify(uploadedIntro));
-
         onCreate(dataUrl);
       } catch (error) {
         console.error("Failed to upload intro:", error);
@@ -151,82 +165,85 @@ export function SplashEditor({ template, onCreate }) {
 
   return (
     <div className="center">
-      <div
-        ref={wrapperRef}
-        style={{
-          position: "relative",
-          width: CANVAS_WIDTH,
-          height: CANVAS_HEIGHT,
-          maxWidth: "100%",
-          border: "1px solid #333",
-          overflow: "hidden",
-          userSelect: "none",
-        }}
-      >
-        <img
-          src={template?.intro}
-          alt="background"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
+      <div className={s.previewBox}>
         <div
-          ref={textRef}
+          ref={wrapperRef}
           style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
+            position: "relative",
             width: "100%",
             height: "100%",
+            overflow: "hidden",
+            userSelect: "none",
           }}
         >
-          {texts.map((item) => (
-            <Rnd
-              key={item.id}
-              bounds="parent"
-              position={{ x: item.x, y: item.y }}
-              size={{ width: item.width, height: item.height }}
-              enableResizing={false}
-              dragAxis="none"
-              style={{ zIndex: 100 }}
-            >
-              <div className={s.divqwe}>
-                <div
-                  className={s.textspan}
-                  style={{ fontSize: item.fontSize, whiteSpace: "pre-wrap" }}
-                >
-                  {item.text}
+          <img
+            src={template?.intro}
+            alt="background"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+          <div
+            ref={textRef}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            {texts.map((item) => (
+              <Rnd
+                key={item.id}
+                bounds="parent"
+                position={{ x: item.x, y: item.y }}
+                size={{ width: item.width, height: item.height }}
+                enableResizing={false}
+                dragAxis="none"
+                style={{ zIndex: 100 }}
+              >
+                <div className={s.divqwe}>
+                  <div
+                    className={s.textspan}
+                    style={{
+                      fontSize: item.fontSize,
+                      whiteSpace: "pre-wrap",
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
+                    }}
+                  >
+                    {item.text}
+                  </div>
                 </div>
-              </div>
-            </Rnd>
-          ))}
+              </Rnd>
+            ))}
+          </div>
         </div>
       </div>
+
       <h2 className={s.h21} style={{ color: "#000" }}>
-        Можно изменить текст заставки
+        Проверьте еще раз, все ли правильно?
       </h2>
+
       <div className="center">
         {!isConfirmed ? (
-          <>
+          <div className={s.editorContainer}>
             <textarea
               className={s.inputName}
               value={editingTextValue}
               onChange={handleEditingChange}
               placeholder="Введите текст заставки"
-              rows={2}
+              rows={3}
             />
-            <button
-              className="buttongreen"
-              style={{ marginTop: -10 }}
-              onClick={handleCreate}
-            >
+            <button className="buttongreen" onClick={handleCreate}>
               Далее
             </button>
-          </>
+          </div>
         ) : (
-          <>
-            <p className="h2" style={{ marginBottom: 20 }}>
+          <div className={s.confirmContainer}>
+            <p className="h2" style={{ marginBottom: 20, textAlign: "center" }}>
               все правильно?
             </p>
-            <div style={{ display: "flex", gap: 10 }}>
+            <div className={s.buttonGroup}>
               <button className="button" onClick={handleEdit}>
                 Нет
               </button>
@@ -234,7 +251,7 @@ export function SplashEditor({ template, onCreate }) {
                 Да
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

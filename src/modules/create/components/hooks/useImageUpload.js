@@ -6,19 +6,30 @@ export function useImageUpload() {
   const [uploading, setUploading] = useState(false);
 
   const compressImage = useCallback(
-    async (dataUrl, quality = 0.7, maxWidth = 800) => {
+    async (dataUrl, quality = 0.95, maxWidth = 1920) => {
       return new Promise((resolve) => {
         const img = new window.Image();
         img.onload = () => {
           let { width, height } = img;
+
+          // Масштабируем только если изображение больше 1920px
           if (width > maxWidth) {
             height *= maxWidth / width;
             width = maxWidth;
           }
+
           const canvas = document.createElement("canvas");
           canvas.width = width;
           canvas.height = height;
-          canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+
+          const ctx = canvas.getContext("2d");
+          // Улучшаем качество рендеринга
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Экспортируем с высоким качеством (0.95 для JPEG)
           canvas.toBlob((blob) => resolve(blob), "image/jpeg", quality);
         };
         img.src = dataUrl;
@@ -34,7 +45,8 @@ export function useImageUpload() {
       setUploading(true);
 
       try {
-        const blob = await compressImage(src, 0.7, 800);
+        // Используем качество 0.95 и максимальную ширину 1920px
+        const blob = await compressImage(src, 0.95, 1920);
         const url = URL.createObjectURL(blob);
         const formData = new FormData();
         formData.append("backgrounds", blob, `bg_${Date.now()}.jpg`);
@@ -62,7 +74,7 @@ export function useImageUpload() {
         return { id: uuidv4(), url, blob, uploadedUrls };
       } catch (error) {
         console.error("Failed to upload image:", error);
-        const blob = await compressImage(src, 0.7, 800);
+        const blob = await compressImage(src, 0.95, 1920);
         const url = URL.createObjectURL(blob);
         return { id: uuidv4(), url, blob };
       } finally {

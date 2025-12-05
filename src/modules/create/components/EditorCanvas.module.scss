@@ -128,7 +128,12 @@
   }
 }
 
-.h6 {
+.h7 {
+  display: none;
+}
+.h6,
+.h7,
+.h8 {
   font-weight: 500;
   font-size: 18px;
   font-family: "Nunito", sans-serif;
@@ -238,35 +243,6 @@ input[type="file"] {
   }
 }
 
-// Средние планшеты (481px - 768px)
-@media (max-width: 768px) and (min-width: 481px) {
-  .inputName {
-    font-size: 18px;
-    padding: 14px 18px;
-  }
-
-  .canvasWrapper {
-    padding: 16px;
-    margin: 16px 10px;
-    max-width: calc(100vw - 20px);
-  }
-
-  .h6 {
-    font-size: 16px;
-    line-height: 1.5;
-  }
-
-  .button,
-  .buttongreen {
-    padding: 11px 22px;
-    font-size: 13px;
-  }
-
-  .flex {
-    gap: 14px;
-  }
-}
-
 // Мобильные устройства (до 480px)
 @media (max-width: 660px) {
   .inputName {
@@ -275,6 +251,11 @@ input[type="file"] {
     margin-bottom: 10px;
   }
 
+  .h7 {
+    font-size: 16px;
+    display: block;
+    line-height: 1.5;
+  }
   .canvasWrapper {
     padding: 10px;
     margin: 10px 6px;
@@ -283,7 +264,9 @@ input[type="file"] {
       max-width: 360px;
     }
   }
-
+  .h8 {
+    display: none;
+  }
   .h6 {
     font-size: 15px;
     padding: 0 12px;
