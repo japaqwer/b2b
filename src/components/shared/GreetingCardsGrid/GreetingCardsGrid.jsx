@@ -96,21 +96,6 @@ export default function GreetingCardsGrid() {
                 <button className={s.playButton} title="Смотреть демо">
                   <BsPlayFill size={24} />
                 </button>
-                <button
-                  className={`${s.actionButton} ${s.favoriteButton}`}
-                  onClick={(e) => handleToggleFavorite(e, item)}
-                  title={
-                    isFavorite(item?.id)
-                      ? "Удалить из избранного"
-                      : "Добавить в избранное"
-                  }
-                >
-                  {isFavorite(item?.id) ? (
-                    <AiFillHeart size={18} color="#ff3333" />
-                  ) : (
-                    <AiOutlineHeart size={18} />
-                  )}
-                </button>
               </div>
             )}
             <div className={s.cardInfo}>

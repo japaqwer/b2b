@@ -84,10 +84,10 @@
   justify-content: center;
   padding: 20px;
   border-radius: 12px;
-  // background: linear-gradient(135deg, #f8f9fa 0%, #f0f0f0 100%);
   background: #fff;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  margin: 20px 0;
+  margin: 20px auto;
+  max-width: 680px; // 640px + padding
 
   canvas {
     border-radius: 8px;
@@ -121,6 +121,23 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.h6 {
+  font-weight: 500;
+  font-size: 18px;
+  font-family: "Nunito", sans-serif;
+  text-align: center;
+  color: #666;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.flex {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 // ===== КНОПКИ =====
@@ -219,6 +236,17 @@ input[type="file"] {
   .canvasWrapper {
     padding: 16px;
     margin: 15px 0;
+    max-width: 100%;
+
+    canvas {
+      max-width: 100%;
+      height: auto !important;
+    }
+  }
+
+  .h6 {
+    font-size: 16px;
+    padding: 0 10px;
   }
 
   .button,
@@ -239,6 +267,20 @@ input[type="file"] {
   }
 }
 
+@media (max-width: 680px) {
+  .canvasWrapper {
+    padding: 12px;
+    margin: 12px 0;
+    border-radius: 8px;
+
+    canvas {
+      width: 100% !important;
+      max-width: calc(100vw - 48px);
+      height: auto !important;
+    }
+  }
+}
+
 @media (max-width: 480px) {
   .inputName {
     font-size: 16px;
@@ -256,9 +298,14 @@ input[type="file"] {
   }
 
   .canvasWrapper {
-    padding: 12px;
-    margin: 12px 0;
+    padding: 10px;
+    margin: 10px 0;
     border-radius: 8px;
+  }
+
+  .h6 {
+    font-size: 14px;
+    padding: 0 8px;
   }
 
   .button,
@@ -268,9 +315,10 @@ input[type="file"] {
     width: 100%;
   }
 
-  .wrap {
+  .flex {
     flex-direction: column;
     width: 100%;
+    gap: 10px;
 
     button,
     a {

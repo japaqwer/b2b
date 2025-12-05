@@ -11,6 +11,10 @@ export function SplashEditor({ template, onCreate }) {
   const textRef = useRef(null);
   const measureContext = useRef(null);
 
+  // Новые размеры для 16:9
+  const CANVAS_WIDTH = 640;
+  const CANVAS_HEIGHT = 360;
+
   const [texts, setTexts] = useState([]);
   const [editingTextId, setEditingTextId] = useState(null);
   const [editingTextValue, setEditingTextValue] = useState(
@@ -100,6 +104,7 @@ export function SplashEditor({ template, onCreate }) {
     });
     return canvas.toDataURL("image/png");
   };
+
   function dataURLtoFile(dataurl, filename) {
     const [header, b64] = dataurl.split(",");
     const mime = header.match(/:(.*?);/)[1];
@@ -150,8 +155,9 @@ export function SplashEditor({ template, onCreate }) {
         ref={wrapperRef}
         style={{
           position: "relative",
-          width: 360,
-          height: 360,
+          width: CANVAS_WIDTH,
+          height: CANVAS_HEIGHT,
+          maxWidth: "100%",
           border: "1px solid #333",
           overflow: "hidden",
           userSelect: "none",

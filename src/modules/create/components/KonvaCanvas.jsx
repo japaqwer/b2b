@@ -22,6 +22,10 @@ export default function KonvaCanvas({
   const lastDist = useRef(0);
   const isPinching = useRef(false);
 
+  // Новые размеры для 16:9
+  const STAGE_WIDTH = 640;
+  const STAGE_HEIGHT = 360;
+
   // Загружаем фоновую картинку из URL
   useEffect(() => {
     if (!bgImage) {
@@ -221,8 +225,8 @@ export default function KonvaCanvas({
   return (
     <Stage
       ref={stageRef}
-      width={360}
-      height={360}
+      width={STAGE_WIDTH}
+      height={STAGE_HEIGHT}
       onMouseDown={handleStageClick}
       onTouchStart={handleTouchStart}
       onWheel={handleWheel}
@@ -244,8 +248,8 @@ export default function KonvaCanvas({
         {loadedBgImage && (
           <Image
             image={loadedBgImage}
-            width={360}
-            height={360}
+            width={STAGE_WIDTH}
+            height={STAGE_HEIGHT}
             listening={false}
             perfectDrawEnabled={false}
           />
@@ -274,8 +278,8 @@ export default function KonvaCanvas({
         {shouldRenderCover && loadedCoverImage && (
           <Image
             image={loadedCoverImage}
-            width={360}
-            height={360}
+            width={STAGE_WIDTH}
+            height={STAGE_HEIGHT}
             listening={false}
             perfectDrawEnabled={false}
           />

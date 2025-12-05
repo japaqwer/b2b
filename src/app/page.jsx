@@ -7,9 +7,9 @@ export default function Home() {
     <div>
       <One />
       <GreetingCardsGrid />
-      <CategoryFilter mainCategoryCodename="bd" />
+      {/* <CategoryFilter mainCategoryCodename="bd" />
       <CategoryFilter mainCategoryCodename="weddinganniversary" />
-      <CategoryFilter mainCategoryCodename="calendar" />
+      <CategoryFilter mainCategoryCodename="calendar" /> */}
     </div>
   );
 }

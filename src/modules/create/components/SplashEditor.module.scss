@@ -24,6 +24,8 @@
   color: #333;
   min-height: 100px;
   resize: none;
+  max-width: 640px;
+  width: 100%;
   @include smooth-transition;
 
   &:focus {
@@ -69,11 +71,10 @@
 // ===== ТЕКСТ ЭЛЕМЕНТЫ =====
 .textdr {
   font-size: 26px;
-  // font-family: "Nunito", sans-serif;
   font-weight: 600;
   line-height: 26px;
   text-wrap: nowrap;
-  width: 360px;
+  max-width: 640px;
   color: #333;
 }
 
@@ -82,9 +83,8 @@
   font-family: "Arco", sans-serif !important;
   font-weight: 700;
   line-height: 38px;
-  max-width: 360px;
+  max-width: 640px;
   color: #fff;
-  // letter-spacing: 1px;
 }
 
 .divqwe {
@@ -130,8 +130,9 @@
 
 .previewBox {
   position: relative;
-  width: 360px;
+  width: 640px;
   height: 360px;
+  max-width: 100%;
   border: 3px solid rgba(255, 153, 34, 0.3);
   overflow: hidden;
   user-select: none;
@@ -241,12 +242,12 @@
   .textdr {
     font-size: 22px;
     line-height: 24px;
-    width: 320px;
   }
 
   .previewBox {
-    width: 320px;
-    height: 320px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
     border-radius: 8px;
   }
 
@@ -270,6 +271,13 @@
   }
 }
 
+@media (max-width: 680px) {
+  .previewBox {
+    width: calc(100vw - 40px);
+    max-width: 640px;
+  }
+}
+
 @media (max-width: 480px) {
   .inputName {
     font-size: 14px;
@@ -286,12 +294,10 @@
   .textdr {
     font-size: 18px;
     line-height: 20px;
-    width: 280px;
   }
 
   .previewBox {
-    width: 280px;
-    height: 280px;
+    width: calc(100vw - 24px);
     border-width: 2px;
   }
 
@@ -304,7 +310,7 @@
   .buttongreen {
     padding: 8px 16px;
     font-size: 12px;
-    width: auto;
+    width: 100%;
   }
 
   .flex,

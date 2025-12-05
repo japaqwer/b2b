@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
           <Header />
           <main className="container">{children}</main>
           <FAQ />
-          <Footer />
+          {/* <Footer /> */}
         </CategoriesProvider>
       </body>
     </html>

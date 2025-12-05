@@ -174,7 +174,7 @@ export default function OrderIdPage() {
                 <source src={orderData.video_url} type="video/mp4" />
                 Ваш браузер не поддерживает видео.
               </video>
-              <div className={s.watermarkOverlay}>
+              {/* <div className={s.watermarkOverlay}>
                 <span className={`${s.watermarkText} ${s.watermarkTopLeft}`}>
                   НЕ ОПЛАЧЕНО
                 </span>
@@ -183,12 +183,12 @@ export default function OrderIdPage() {
                 >
                   НЕ ОПЛАЧЕНО
                 </span>
-              </div>
+              </div> */}
             </>
           )}
         </div>
 
-        {showGetCardButton && (
+        {/* {showGetCardButton && (
           <div className={s.buttonContainer}>
             <button className={s.button} onClick={handleEdit}>
               Переделать
@@ -197,7 +197,7 @@ export default function OrderIdPage() {
               <button className={s.buttonGreen}>Получить</button>
             </Link>
           </div>
-        )}
+        )} */}
       </div>
     );
   }
