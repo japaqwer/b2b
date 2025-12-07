@@ -56,13 +56,8 @@ export function useOrderCreation() {
           intro: finalIntro || "",
         };
 
-        const params = {
-          template_id: template.id,
-          cyclic,
-          referral: "b2b",
-          promo_code: "b2b",
-        };
-        // if (appliedPromo) params.promo_code = appliedPromo;
+        const params = { template_id: template.id, cyclic, referral: "datki" };
+        if (appliedPromo) params.promo_code = appliedPromo;
 
         const res = await axios.post(
           "https://api-workhub.site/api/v1/base/order/create-generate",
