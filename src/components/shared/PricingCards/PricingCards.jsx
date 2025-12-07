@@ -30,13 +30,13 @@ const pricingPlans = [
   },
   {
     id: 3,
-    name: "prime",
-    price: "600₽",
+    name: "ПРЕМИУМ от",
+    price: "1500₽",
     title: "Видео поздравление ученикам от Деда Мороза",
     duration: "Продолжительность 2:20 минуты",
     image:
       "https://3051c4dd-6445-4f5d-8dd4-ca4d65add868.selstorage.ru/templates/schoolDM/preview/2168d65e-1fa5-4b45-9b6c-4c335caab074.jpg",
-    demoUrl: "https://kinescope.io/embed/vN9xb1wUGnGk75D83nj5Tj",
+    demoUrl: "https://kinescope.io/embed/7vgMJydBP6KF7voc7iJPiA",
     // featured: true,
     href: "#",
   },
@@ -99,14 +99,15 @@ export default function PricingCards() {
 
             <div className={s.cardContent}>
               <h3 className={s.planName}>
-                {plan.name} – <span className={s.price}>{plan.price}</span>
+                {plan.name} <span className={s.price}>{plan.price}</span>
               </h3>
               <p className={s.planTitle}>{plan.title}</p>
               {plan.duration && (
                 <p className={s.planDuration}>{plan.duration}</p>
               )}
-              <Link href={plan.href}></Link>
-              <button className={s.createButton}>Создать поздравление</button>
+              <Link href={plan.href} className={s.createButton}>
+                Создать поздравление
+              </Link>
             </div>
           </div>
         ))}
@@ -134,9 +135,11 @@ export default function PricingCards() {
 
             <div className={s.modalFooter}>
               <h2>Демонстрация шаблона</h2>
-              <button className={s.modalCreateButton}>
-                Создать поздравление
-              </button>
+              <Link href={selectedCard.href}>
+                <button className={s.modalCreateButton}>
+                  Создать поздравление
+                </button>
+              </Link>
             </div>
           </div>
         </div>
