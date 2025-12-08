@@ -49,6 +49,13 @@ export default function PricingCards() {
     setSelectedCard(card);
   };
 
+  const handleClear = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("uploadedBackgrounds");
+      localStorage.removeItem("uploadedIntro");
+      localStorage.removeItem("appliedPromoCode");
+    }
+  };
   const handleCloseModal = () => {
     setSelectedCard(null);
   };
@@ -105,7 +112,11 @@ export default function PricingCards() {
               {plan.duration && (
                 <p className={s.planDuration}>{plan.duration}</p>
               )}
-              <Link href={plan.href} className={s.createButton}>
+              <Link
+                href={plan.href}
+                onClick={handleClear}
+                className={s.createButton}
+              >
                 Создать поздравление
               </Link>
             </div>
@@ -135,7 +146,7 @@ export default function PricingCards() {
 
             <div className={s.modalFooter}>
               <h2>Демонстрация шаблона</h2>
-              <Link href={selectedCard.href}>
+              <Link href={selectedCard.href} onClick={handleClear}>
                 <button className={s.modalCreateButton}>
                   Создать поздравление
                 </button>
