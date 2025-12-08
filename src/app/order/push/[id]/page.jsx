@@ -3,6 +3,7 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 import s from "./OrderPush.module.scss";
 
@@ -16,7 +17,16 @@ export default function OrderPushPage() {
     const textToCopy = `Мой заказ ${orderCode}`;
     navigator.clipboard
       .writeText(textToCopy)
-      .then(() => {})
+      .then(() => {
+        toast.success("Номер заказа успешно скопирован!", {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      })
       .catch((err) => {
         const textarea = document.createElement("textarea");
         textarea.value = textToCopy;
@@ -24,6 +34,15 @@ export default function OrderPushPage() {
         textarea.select();
         document.execCommand("copy");
         document.body.removeChild(textarea);
+
+        toast.success("Номер заказа успешно скопирован!", {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       });
   };
 
@@ -37,6 +56,7 @@ export default function OrderPushPage() {
           className={s.orderCode}
           onClick={handleCopy}
           title="Нажмите для копирования"
+          style={{ cursor: "pointer" }}
         >
           <span className={s.orderCodeText}>{orderCode}</span>
         </div>
