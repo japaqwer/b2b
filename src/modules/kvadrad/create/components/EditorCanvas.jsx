@@ -188,8 +188,9 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
       />
 
       <div className="center" style={{ marginTop: 10 }}>
-        <h4 className={s.h6} style={{ textAlign: "center" }}>
-          Измените размер фото и его положение привычными движениями пальцев
+        <h4 className={s.h6} style={{ textAlign: "center", marginBottom: 10 }}>
+          Измените размер фото и его положение привычными движениями пальцев или
+          мышки
         </h4>
         <div className={s.flex} style={{ gap: 20 }}>
           {!userImage && (

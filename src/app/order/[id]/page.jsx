@@ -188,7 +188,7 @@ export default function OrderIdPage() {
           )}
         </div>
 
-        {/* {showGetCardButton && (
+        {showGetCardButton && (
           <div className={s.buttonContainer}>
             <button className={s.button} onClick={handleEdit}>
               Переделать
@@ -197,7 +197,7 @@ export default function OrderIdPage() {
               <button className={s.buttonGreen}>Получить</button>
             </Link>
           </div>
-        )} */}
+        )}
       </div>
     );
   }

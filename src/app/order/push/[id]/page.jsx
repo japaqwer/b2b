@@ -42,9 +42,8 @@ export default function OrderPushPage() {
         </div>
 
         <p className={s.h3}>
-          Нажмите на номер заказа, чтобы <br /> его скопировать и отправить
-          удобным <br />
-          способом для получения открытки
+          Нажмите на номер заказа, чтобы <br /> его скопировать и отправить в
+          Телеграм
         </p>
       </div>
       <div className={s.flex}>
@@ -54,7 +53,7 @@ export default function OrderPushPage() {
           rel="noopener noreferrer"
           className={s.buttonBlue}
         >
-          В Телеграм
+          Отправить заказ в Телеграм
         </Link>
       </div>
     </div>
