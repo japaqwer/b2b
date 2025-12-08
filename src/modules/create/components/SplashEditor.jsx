@@ -30,13 +30,13 @@ export function SplashEditor({ template, onCreate }) {
       let newScaleFactor = 1;
 
       if (width <= 360) {
-        newScaleFactor = 0.56; // 18px от базовых 32px
+        newScaleFactor = 0.5; // 16px от базовых 32px
       } else if (width <= 480) {
-        newScaleFactor = 0.625; // 20px
+        newScaleFactor = 0.5625; // 18px
       } else if (width <= 768) {
-        newScaleFactor = 0.75; // 24px
+        newScaleFactor = 0.6875; // 22px
       } else if (width <= 1024) {
-        newScaleFactor = 0.875; // 28px
+        newScaleFactor = 0.8125; // 26px
       } else {
         newScaleFactor = 1; // 32px
       }
@@ -235,7 +235,7 @@ export function SplashEditor({ template, onCreate }) {
               position: "absolute",
               top: 0,
               left: 0,
-              width: "100%",
+              width: "90%",
               height: "100%",
             }}
           >
