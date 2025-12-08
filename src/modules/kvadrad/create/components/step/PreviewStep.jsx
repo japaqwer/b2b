@@ -16,7 +16,7 @@ export default function PreviewStep({
   handleSend,
   setCyclic,
   result,
-  setCurrentFile, // Добавляем этот проп
+  setCurrentFile,
 }) {
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
@@ -78,19 +78,16 @@ export default function PreviewStep({
     setSelectedItem(null);
   };
 
-  // Обработчик для выбора файла
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       setCurrentFile(file);
-      setStep(3); // Переходим на этап редактирования
+      setStep(3);
     }
   };
 
-  // Обработчик для кнопки "Добавить фото"
   const handleAddPhoto = () => {
     setStep(1);
-    // fileInputRef.current?.click();
   };
 
   const handleCreateOrder = async () => {
@@ -196,8 +193,6 @@ export default function PreviewStep({
           </div>
         </div>
       )}
-
-      {/* Скрытый input для выбора файла */}
       <input
         ref={fileInputRef}
         type="file"

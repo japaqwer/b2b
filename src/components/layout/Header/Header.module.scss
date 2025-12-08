@@ -1,7 +1,11 @@
 .header {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   img {
-    width: 100%;
+    max-width: 900px;
+    border-radius: 13px;
   }
 }
 
@@ -9,6 +13,7 @@
   .header {
     height: 100px;
     img {
+      max-width: 100%;
       height: auto;
     }
   }

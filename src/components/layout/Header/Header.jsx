@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <div className={s.header}>
       <img
-        src="https://s3.eu-north-1.amazonaws.com/exclusivenedbucket/28950f13-46d8-478d-8d82-dc7c0693b56a.png"
+        src="https://s3.eu-north-1.amazonaws.com/exclusivenedbucket/b1fe3967-a65c-4aa2-80a7-e571ac46258e.png"
         alt="ss"
       />
     </div>

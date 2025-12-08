@@ -11,7 +11,6 @@ export default function OrderPushPage() {
   const orderCode = params.id;
 
   const telegramText = `Мой заказ ${orderCode}`;
-  const whatsappText = `Мой заказ ${orderCode}`;
 
   const handleCopy = () => {
     const textToCopy = `Мой заказ ${orderCode}`;
@@ -19,9 +18,6 @@ export default function OrderPushPage() {
       .writeText(textToCopy)
       .then(() => {})
       .catch((err) => {
-        console.error("Ошибка при копировании:", err);
-
-        // Fallback для старых браузеров
         const textarea = document.createElement("textarea");
         textarea.value = textToCopy;
         document.body.appendChild(textarea);
@@ -59,17 +55,6 @@ export default function OrderPushPage() {
           className={s.buttonBlue}
         >
           В Телеграм
-        </Link>
-
-        <Link
-          href={`https://wa.me/79151340402?text=${encodeURIComponent(
-            whatsappText
-          )}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={s.buttonGreen}
-        >
-          На Whatsapp
         </Link>
       </div>
     </div>

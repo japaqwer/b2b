@@ -37,34 +37,37 @@
 .cardImage {
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%;
+  // padding-bottom: 56.25%;
   overflow: hidden;
   cursor: pointer;
-  background: linear-gradient(135deg, #1a5f5f 0%, #2d8b8b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // background: linear-gradient(135deg, #1a5f5f 0%, #2d8b8b 100%);
 
   img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    // position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 100%;
-    object-fit: cover;
+    // object-fit: cover;
   }
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      180deg,
-      transparent 60%,
-      rgba(0, 0, 0, 0.3) 100%
-    );
-    z-index: 1;
-  }
+  // &::before {
+  //   content: "";
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   right: 0;
+  //   bottom: 0;
+  //   background: linear-gradient(
+  //     180deg,
+  //     transparent 60%,
+  //     rgba(0, 0, 0, 0.3) 100%
+  //   );
+  //   z-index: 1;
+  // }
 }
 
 .playButton {
