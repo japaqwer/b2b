@@ -6,13 +6,12 @@ import { useOrderCreation } from "./hooks/useOrderCreation";
 import { useDragAndDrop } from "./hooks/useDragAndDrop";
 import { useImageManager } from "./hooks/useImageManager";
 import { SplashEditor } from "./SplashEditor";
-import PromoStep from "./step/PromoStep";
 import EditStep from "./step/EditStep";
 import PreviewStep from "./step/PreviewStep";
 
 const PROMO_STORAGE_KEY = "appliedPromoCode";
 
-export default function MultiStepEditorGeneryKvadrat({ template }) {
+export default function MultiStepEditorGenery({ template }) {
   const { step, setStep } = useStepNavigation();
   const { uploadImage, uploading } = useImageUpload();
   const { createOrder, sending, result } = useOrderCreation();
@@ -48,7 +47,7 @@ export default function MultiStepEditorGeneryKvadrat({ template }) {
     const imageData = await uploadImage(src);
     addImage(imageData);
     setCurrentFile(null);
-    setStep(3);
+    setStep(2);
   };
 
   const handleSend = async () => {
@@ -63,31 +62,21 @@ export default function MultiStepEditorGeneryKvadrat({ template }) {
     });
   };
 
-  if (step === 0) {
-    return (
-      <PromoStep
-        template={template}
-        onPromoResult={(code) => {
-          setAppliedPromo(code);
-          setStep(hasIntro ? 1 : 2);
-        }}
-      />
-    );
-  }
-
-  if (step === 1 && hasIntro) {
+  // Шаг 0: SplashEditor (если есть intro)
+  if (step === 0 && hasIntro) {
     return (
       <SplashEditor
         template={template}
         onCreate={(src) => {
           setIntroSrc(src);
-          setStep(2);
+          setStep(1);
         }}
       />
     );
   }
 
-  if (step === 2) {
+  // Шаг 1: EditStep
+  if (step === 1) {
     return (
       <EditStep
         template={template}
@@ -98,7 +87,8 @@ export default function MultiStepEditorGeneryKvadrat({ template }) {
     );
   }
 
-  if (step === 3) {
+  // Шаг 2: PreviewStep
+  if (step === 2) {
     return (
       <PreviewStep
         sensors={sensors}
