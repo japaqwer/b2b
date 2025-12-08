@@ -10,13 +10,10 @@ export default function FAQ() {
       <h4>Напишите нам, постараемся помочь</h4>
       <div className={s.flex}>
         <Link
-          href={"https://wa.me/79151340402"}
+          href={"https://t.me/multfamilyoficial"}
           target="_blank"
-          className={s.wat}
+          className={s.tel}
         >
-          <FaWhatsapp size={40} />
-        </Link>
-        <Link href={"https://t.me/muzOkkk"} target="_blank" className={s.tel}>
           <FaTelegramPlane size={40} />
         </Link>
       </div>

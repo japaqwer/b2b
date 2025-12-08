@@ -217,9 +217,6 @@ export function SplashEditor({ template, onCreate }) {
           </>
         ) : (
           <>
-            <p className="h2" style={{ marginBottom: 20 }}>
-              все правильно?
-            </p>
             <div style={{ display: "flex", gap: 10 }}>
               <button className="button" onClick={handleEdit}>
                 Нет

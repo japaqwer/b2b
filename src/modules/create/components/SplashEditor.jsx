@@ -13,6 +13,7 @@ export function SplashEditor({ template, onCreate }) {
 
   const CANVAS_WIDTH = 640;
   const CANVAS_HEIGHT = 360;
+  const BASE_FONT_SIZE = 32;
 
   const [texts, setTexts] = useState([]);
   const [editingTextId, setEditingTextId] = useState(null);
@@ -20,6 +21,33 @@ export function SplashEditor({ template, onCreate }) {
     `${template.title}` || ""
   );
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [scaleFactor, setScaleFactor] = useState(1);
+
+  // Отслеживание изменения размера окна
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      let newScaleFactor = 1;
+
+      if (width <= 360) {
+        newScaleFactor = 0.56; // 18px от базовых 32px
+      } else if (width <= 480) {
+        newScaleFactor = 0.625; // 20px
+      } else if (width <= 768) {
+        newScaleFactor = 0.75; // 24px
+      } else if (width <= 1024) {
+        newScaleFactor = 0.875; // 28px
+      } else {
+        newScaleFactor = 1; // 32px
+      }
+
+      setScaleFactor(newScaleFactor);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     measureContext.current = document.createElement("canvas").getContext("2d");
@@ -28,7 +56,7 @@ export function SplashEditor({ template, onCreate }) {
       setTimeout(() => {
         if (wrapperRef.current) {
           const wrap = wrapperRef.current;
-          const fs = 32;
+          const fs = BASE_FONT_SIZE;
           const { width, height } = measureTextSize(`${template.title}`, fs);
           const id = Date.now();
           setTexts([
@@ -48,21 +76,41 @@ export function SplashEditor({ template, onCreate }) {
     }
   }, [template.title]);
 
+  // Пересчет позиций и размеров при изменении scaleFactor
+  useEffect(() => {
+    if (texts.length > 0 && wrapperRef.current) {
+      const wrap = wrapperRef.current;
+      setTexts((prev) =>
+        prev.map((t) => {
+          const { width, height } = measureTextSize(t.text, t.fontSize);
+          return {
+            ...t,
+            width,
+            height,
+            x: (wrap.clientWidth - width) / 2,
+            y: (wrap.clientHeight - height) / 2,
+          };
+        })
+      );
+    }
+  }, [scaleFactor]);
+
   const measureTextSize = (text, fontSize) => {
     const ctx = measureContext.current;
-    // Используем шрифт Arco как в стилях
-    ctx.font = `700 ${fontSize}px Arco, sans-serif`;
+    const actualFontSize = fontSize * scaleFactor;
+    ctx.font = `700 ${actualFontSize}px Arco, sans-serif`;
 
     const lines = text.split("\n");
-    const lineHeight = 38; // Из .textspan
+    const baseLineHeight = 38;
+    const lineHeight = baseLineHeight * scaleFactor;
 
     const widths = lines.map((line) => {
       const measured = ctx.measureText(line || " ");
-      return measured.width + 32;
+      return measured.width + 32 * scaleFactor;
     });
 
-    const maxWidth = Math.max(...widths, 120);
-    const height = lineHeight * lines.length + 24;
+    const maxWidth = Math.max(...widths, 120 * scaleFactor);
+    const height = lineHeight * lines.length + 24 * scaleFactor;
 
     return { width: maxWidth, height };
   };
@@ -74,7 +122,7 @@ export function SplashEditor({ template, onCreate }) {
     if (!wrapperRef.current) return;
 
     const wrap = wrapperRef.current;
-    const fs = 32;
+    const fs = BASE_FONT_SIZE;
     const { width, height } = measureTextSize(val || " ", fs);
 
     if (editingTextId == null) {
@@ -205,7 +253,9 @@ export function SplashEditor({ template, onCreate }) {
                   <div
                     className={s.textspan}
                     style={{
-                      fontSize: item.fontSize,
+                      fontSize: item.fontSize * scaleFactor,
+                      lineHeight: `${38 * scaleFactor}px`,
+                      padding: `${12 * scaleFactor}px ${16 * scaleFactor}px`,
                       whiteSpace: "pre-wrap",
                       wordBreak: "break-word",
                       overflowWrap: "break-word",
@@ -240,9 +290,6 @@ export function SplashEditor({ template, onCreate }) {
           </div>
         ) : (
           <div className={s.confirmContainer}>
-            <p className="h2" style={{ marginBottom: 20, textAlign: "center" }}>
-              все правильно?
-            </p>
             <div className={s.buttonGroup}>
               <button className="button" onClick={handleEdit}>
                 Нет
