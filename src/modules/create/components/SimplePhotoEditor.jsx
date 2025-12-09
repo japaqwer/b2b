@@ -320,7 +320,9 @@ const SimplePhotoEditor = forwardRef(
       };
 
       const newScale = e.deltaY < 0 ? oldScaleX * scaleBy : oldScaleX / scaleBy;
-      const clampedScale = Math.max(0.1, Math.min(newScale, 10));
+
+      // Убираем минимальное ограничение, оставляем только максимальное
+      const clampedScale = Math.min(newScale, 10);
 
       setImageTransform((prev) => ({
         ...prev,
@@ -416,7 +418,9 @@ const SimplePhotoEditor = forwardRef(
         };
 
         const scale = imageTransform.scaleX * (dist / lastDist.current);
-        const clampedScale = Math.max(0.1, Math.min(scale, 10));
+
+        // Убираем минимальное ограничение, оставляем только максимальное
+        const clampedScale = Math.min(scale, 10);
 
         const dx = newCenter.x - lastCenter.current.x;
         const dy = newCenter.y - lastCenter.current.y;
@@ -501,9 +505,7 @@ const SimplePhotoEditor = forwardRef(
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, 1920, 1080);
 
-        // 1. Фон (если есть)
-
-        // 2. Пользовательское изображение (z-index: 0)
+        // 1. Пользовательское изображение (z-index: 0)
         if (images.user && imageTransform.width > 0) {
           ctx.save();
           ctx.drawImage(
@@ -515,6 +517,8 @@ const SimplePhotoEditor = forwardRef(
           );
           ctx.restore();
         }
+
+        // 2. Фон (если есть)
         if (images.bg) {
           ctx.drawImage(images.bg, 0, 0, 1920, 1080);
         }
