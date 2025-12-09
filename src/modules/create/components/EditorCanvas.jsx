@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import s from "./EditorCanvas.module.scss";
 
-const KonvaCanvas = dynamic(() => import("./KonvaCanvas"), {
+const SimplePhotoEditor = dynamic(() => import("./SimplePhotoEditor"), {
   ssr: false,
   loading: () => <div className={s.loadingContainer}>Загрузка...</div>,
 });
@@ -17,9 +17,9 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
   const stageRef = useRef(null);
   const imageRef = useRef(null);
   const transformerRef = useRef(null);
+  const editorRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Целевое разрешение для экспорта (1920x1080 - Full HD)
   const EXPORT_WIDTH = 1920;
   const EXPORT_HEIGHT = 1080;
 
@@ -27,7 +27,6 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
     setMounted(true);
   }, []);
 
-  // Автоматически открываем диалог выбора файла, если нет изображения
   useEffect(() => {
     if (mounted && !inputSrc && !userImage) {
       const timer = setTimeout(() => {
@@ -58,15 +57,8 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
     }
   }, [inputSrc]);
 
-  useEffect(() => {
-    if (selectedId && transformerRef.current && imageRef.current) {
-      transformerRef.current.nodes([imageRef.current]);
-      transformerRef.current.getLayer().batchDraw();
-    }
-  }, [selectedId]);
-
   const handleExport = async () => {
-    if (!stageRef.current || !userImage) return null;
+    if (!editorRef.current || !userImage) return null;
 
     setSelectedId(null);
     setIsExporting(true);
@@ -74,46 +66,7 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     try {
-      const stage = stageRef.current;
-      const currentWidth = stage.width();
-      const currentHeight = stage.height();
-
-      // Вычисляем масштаб для экспорта в 1920x1080
-      const scaleX = EXPORT_WIDTH / currentWidth;
-      const scaleY = EXPORT_HEIGHT / currentHeight;
-
-      // Создаем финальный canvas с разрешением 1920x1080
-      const finalCanvas = document.createElement("canvas");
-      finalCanvas.width = EXPORT_WIDTH;
-      finalCanvas.height = EXPORT_HEIGHT;
-
-      const finalCtx = finalCanvas.getContext("2d");
-
-      // Заполняем белым фоном
-      finalCtx.fillStyle = "#FFFFFF";
-      finalCtx.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
-
-      // Масштабируем контекст для высокого качества
-      finalCtx.scale(scaleX, scaleY);
-
-      // Рисуем все слои
-      const layers = stage.getLayers();
-      layers.forEach((layer) => {
-        const layerCanvas = layer.getCanvas();
-        if (layerCanvas && layerCanvas._canvas) {
-          finalCtx.drawImage(
-            layerCanvas._canvas,
-            0,
-            0,
-            currentWidth,
-            currentHeight
-          );
-        }
-      });
-
-      // Экспортируем в PNG с максимальным качеством
-      const dataUrl = finalCanvas.toDataURL("image/png", 1.0);
-
+      const dataUrl = await editorRef.current.exportHighRes();
       setIsExporting(false);
       return dataUrl;
     } catch (error) {
@@ -152,16 +105,7 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
   };
 
   const handleTransformEnd = () => {
-    const node = imageRef.current;
-    if (!node) return;
-
-    const scaleX = node.scaleX();
-    const scaleY = node.scaleY();
-
-    node.scaleX(1);
-    node.scaleY(1);
-    node.width(Math.max(5, node.width() * scaleX));
-    node.height(Math.max(5, node.height() * scaleY));
+    // Callback для трансформации
   };
 
   if (!mounted) {
@@ -175,7 +119,8 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
   return (
     <div className="center">
       <div className={s.canvasWrapper}>
-        <KonvaCanvas
+        <SimplePhotoEditor
+          ref={editorRef}
           stageRef={stageRef}
           imageRef={imageRef}
           transformerRef={transformerRef}
