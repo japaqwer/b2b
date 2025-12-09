@@ -26,10 +26,20 @@ const SimplePhotoEditor = forwardRef(
   ) => {
     const containerRef = useRef(null);
     const canvasRef = useRef(null);
-    const animationFrameRef = useRef(null);
+    const rafRef = useRef(null);
 
-    // Коэффициент масштабирования для высокого качества
-    const QUALITY_SCALE = 3; // 3x разрешение для редактирования
+    // Адаптивный коэффициент качества
+    const getQualityScale = () => {
+      if (typeof window === "undefined") return 2;
+      const windowWidth = window.innerWidth;
+
+      // На мобильных используем меньший scale для производительности
+      if (windowWidth <= 500) return 1.5;
+      if (windowWidth <= 768) return 2;
+      return 2.5;
+    };
+
+    const [QUALITY_SCALE, setQualityScale] = useState(2);
 
     const [stageDimensions, setStageDimensions] = useState({
       width: 640,
@@ -52,6 +62,9 @@ const SimplePhotoEditor = forwardRef(
       height: 0,
     });
 
+    // Временное состояние для плавной анимации
+    const tempTransform = useRef(null);
+
     // Для перетаскивания
     const isDragging = useRef(false);
     const dragStart = useRef({ x: 0, y: 0 });
@@ -65,16 +78,20 @@ const SimplePhotoEditor = forwardRef(
       if (typeof window === "undefined") return { width: 640, height: 360 };
 
       const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
 
       if (windowWidth <= 500) {
-        const width = Math.min(windowWidth - 40, 640);
-        const height = (width * 9) / 16;
+        // Мобильные устройства - можно настроить размер здесь
+        const width = Math.min(windowWidth - 40, 640); // Отступы 20px с каждой стороны
+        const height = (width * 9) / 16; // Соотношение 16:9
         return { width: Math.round(width), height: Math.round(height) };
       } else if (windowWidth <= 768) {
+        // Планшеты
         const width = Math.min(windowWidth - 60, 640);
         const height = (width * 9) / 16;
         return { width: Math.round(width), height: Math.round(height) };
       } else {
+        // Десктоп (> 768px) - стандартные размеры
         return { width: 640, height: 360 };
       }
     };
@@ -84,6 +101,7 @@ const SimplePhotoEditor = forwardRef(
       const updateDimensions = () => {
         const dimensions = calculateStageDimensions();
         setStageDimensions(dimensions);
+        setQualityScale(getQualityScale());
       };
 
       updateDimensions();
@@ -138,9 +156,9 @@ const SimplePhotoEditor = forwardRef(
       };
     }, []);
 
-    // Загрузка изображений в высоком качестве
+    // Загрузка изображений с оптимизацией
     useEffect(() => {
-      const loadImage = (src) => {
+      const loadImage = (src, maxSize = null) => {
         return new Promise((resolve) => {
           if (!src) {
             resolve(null);
@@ -150,7 +168,28 @@ const SimplePhotoEditor = forwardRef(
           const img = new Image();
           img.crossOrigin = "anonymous";
 
-          img.onload = () => resolve(img);
+          img.onload = () => {
+            // Для мобильных уменьшаем размер изображения если оно очень большое
+            if (maxSize && (img.width > maxSize || img.height > maxSize)) {
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+
+              const scale = Math.min(maxSize / img.width, maxSize / img.height);
+              canvas.width = img.width * scale;
+              canvas.height = img.height * scale;
+
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = "high";
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+              const optimizedImg = new Image();
+              optimizedImg.onload = () => resolve(optimizedImg);
+              optimizedImg.src = canvas.toDataURL("image/jpeg", 0.95);
+            } else {
+              resolve(img);
+            }
+          };
+
           img.onerror = () => {
             console.error("Ошибка загрузки изображения:", src);
             resolve(null);
@@ -166,8 +205,12 @@ const SimplePhotoEditor = forwardRef(
         });
       };
 
+      // На мобильных ограничиваем размер
+      const isMobile = window.innerWidth <= 768;
+      const maxSize = isMobile ? 2048 : null;
+
       Promise.all([
-        loadImage(userImage),
+        loadImage(userImage, maxSize),
         loadImage(bgImage),
         loadImage(coverImage),
       ]).then(([user, bg, cover]) => {
@@ -200,61 +243,84 @@ const SimplePhotoEditor = forwardRef(
       }
     }, [images.user, stageDimensions]);
 
-    // Отрисовка canvas в высоком качестве
-    const drawCanvas = () => {
+    // Оптимизированная отрисовка canvas с debounce
+    const drawCanvas = (transform = imageTransform) => {
       if (!canvasRef.current) return;
 
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d", {
         alpha: false,
         desynchronized: true,
+        willReadFrequently: false,
       });
 
-      // Устанавливаем высокое разрешение для canvas
       const displayWidth = stageDimensions.width;
       const displayHeight = stageDimensions.height;
 
       canvas.width = displayWidth * QUALITY_SCALE;
       canvas.height = displayHeight * QUALITY_SCALE;
 
-      // Включаем сглаживание для лучшего качества
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
-
-      // Масштабируем контекст для высокого разрешения
       ctx.scale(QUALITY_SCALE, QUALITY_SCALE);
 
       // Белый фон
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, displayWidth, displayHeight);
 
-      // 1. Фон (если есть) - высокое качество
-
-      // 2. Пользовательское изображение - высокое качество
-      if (images.user && imageTransform.width > 0) {
+      // 2. Пользовательское изображение
+      if (images.user && transform.width > 0) {
         ctx.save();
         ctx.drawImage(
           images.user,
-          imageTransform.x,
-          imageTransform.y,
-          imageTransform.width * imageTransform.scaleX,
-          imageTransform.height * imageTransform.scaleY
+          transform.x,
+          transform.y,
+          transform.width * transform.scaleX,
+          transform.height * transform.scaleY
         );
         ctx.restore();
       }
+      // 1. Фон
       if (images.bg) {
         ctx.drawImage(images.bg, 0, 0, displayWidth, displayHeight);
       }
 
-      // 3. Обложка - высокое качество
+      // 3. Обложка
       if (shouldRenderCover && images.cover) {
         ctx.drawImage(images.cover, 0, 0, displayWidth, displayHeight);
       }
     };
 
+    // Плавная отрисовка с requestAnimationFrame
+    const scheduleRedraw = (newTransform) => {
+      tempTransform.current = newTransform;
+
+      if (rafRef.current) return;
+
+      rafRef.current = requestAnimationFrame(() => {
+        if (tempTransform.current) {
+          drawCanvas(tempTransform.current);
+          tempTransform.current = null;
+        }
+        rafRef.current = null;
+      });
+    };
+
     useEffect(() => {
       drawCanvas();
-    }, [images, stageDimensions, imageTransform, shouldRenderCover]);
+
+      return () => {
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+        }
+      };
+    }, [
+      images,
+      stageDimensions,
+      imageTransform,
+      shouldRenderCover,
+      QUALITY_SCALE,
+    ]);
 
     // Утилиты для pinch-zoom
     const getDistance = (p1, p2) => {
@@ -306,11 +372,14 @@ const SimplePhotoEditor = forwardRef(
 
       const { x, y } = getCanvasCoordinates(e.clientX, e.clientY);
 
-      setImageTransform((prev) => ({
-        ...prev,
+      const newTransform = {
+        ...imageTransform,
         x: x - dragStart.current.x,
         y: y - dragStart.current.y,
-      }));
+      };
+
+      setImageTransform(newTransform);
+      scheduleRedraw(newTransform);
 
       if (onTransformEnd) {
         onTransformEnd();
@@ -347,20 +416,23 @@ const SimplePhotoEditor = forwardRef(
       const newScale = e.deltaY < 0 ? oldScaleX * scaleBy : oldScaleX / scaleBy;
       const clampedScale = Math.max(0.1, Math.min(newScale, 10));
 
-      setImageTransform((prev) => ({
-        ...prev,
+      const newTransform = {
+        ...imageTransform,
         scaleX: clampedScale,
         scaleY: clampedScale,
         x: mouseX - mousePointTo.x * clampedScale,
         y: mouseY - mousePointTo.y * clampedScale,
-      }));
+      };
+
+      setImageTransform(newTransform);
+      scheduleRedraw(newTransform);
 
       if (onTransformEnd) {
         onTransformEnd();
       }
     };
 
-    // Обработчики touch для мобильных
+    // Обработчики touch для мобильных с оптимизацией
     const handleTouchStart = (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -406,7 +478,7 @@ const SimplePhotoEditor = forwardRef(
       const touch2 = e.touches[1];
 
       if (touch1 && touch2 && isPinching.current) {
-        // Pinch zoom
+        // Pinch zoom - оптимизировано для плавности
         const p1 = getCanvasCoordinates(touch1.clientX, touch1.clientY);
         const p2 = getCanvasCoordinates(touch2.clientX, touch2.clientY);
 
@@ -430,25 +502,31 @@ const SimplePhotoEditor = forwardRef(
         const dx = newCenter.x - lastCenter.current.x;
         const dy = newCenter.y - lastCenter.current.y;
 
-        setImageTransform((prev) => ({
-          ...prev,
+        const newTransform = {
+          ...imageTransform,
           scaleX: clampedScale,
           scaleY: clampedScale,
           x: newCenter.x - pointTo.x * clampedScale + dx,
           y: newCenter.y - pointTo.y * clampedScale + dy,
-        }));
+        };
+
+        setImageTransform(newTransform);
+        scheduleRedraw(newTransform);
 
         lastDist.current = dist;
         lastCenter.current = newCenter;
       } else if (touch1 && isDragging.current && !isPinching.current) {
-        // Single touch drag
+        // Single touch drag - оптимизировано
         const { x, y } = getCanvasCoordinates(touch1.clientX, touch1.clientY);
 
-        setImageTransform((prev) => ({
-          ...prev,
+        const newTransform = {
+          ...imageTransform,
           x: x - dragStart.current.x,
           y: y - dragStart.current.y,
-        }));
+        };
+
+        setImageTransform(newTransform);
+        scheduleRedraw(newTransform);
       }
 
       if (onTransformEnd) {
@@ -503,7 +581,6 @@ const SimplePhotoEditor = forwardRef(
           alpha: false,
         });
 
-        // Максимальное качество для экспорта
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = "high";
 
@@ -513,8 +590,6 @@ const SimplePhotoEditor = forwardRef(
         // Белый фон
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, 1920, 1080);
-
-        // 1. Фон в высоком качестве
 
         // 2. Пользовательское изображение в высоком качестве
         if (images.user && imageTransform.width > 0) {
@@ -528,7 +603,7 @@ const SimplePhotoEditor = forwardRef(
           );
           ctx.restore();
         }
-
+        // 1. Фон в высоком качестве
         if (images.bg) {
           ctx.drawImage(images.bg, 0, 0, 1920, 1080);
         }
