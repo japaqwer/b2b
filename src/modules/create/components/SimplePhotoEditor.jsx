@@ -78,20 +78,16 @@ const SimplePhotoEditor = forwardRef(
       if (typeof window === "undefined") return { width: 640, height: 360 };
 
       const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
 
       if (windowWidth <= 500) {
-        // Мобильные устройства - можно настроить размер здесь
-        const width = Math.min(windowWidth - 40, 640); // Отступы 20px с каждой стороны
-        const height = (width * 9) / 16; // Соотношение 16:9
+        const width = Math.min(windowWidth - 40, 640);
+        const height = (width * 9) / 16;
         return { width: Math.round(width), height: Math.round(height) };
       } else if (windowWidth <= 768) {
-        // Планшеты
         const width = Math.min(windowWidth - 60, 640);
         const height = (width * 9) / 16;
         return { width: Math.round(width), height: Math.round(height) };
       } else {
-        // Десктоп (> 768px) - стандартные размеры
         return { width: 640, height: 360 };
       }
     };
@@ -264,11 +260,18 @@ const SimplePhotoEditor = forwardRef(
       ctx.imageSmoothingQuality = "high";
       ctx.scale(QUALITY_SCALE, QUALITY_SCALE);
 
-      // Белый фон
+      // ПРАВИЛЬНЫЙ ПОРЯДОК СЛОЕВ:
+
+      // 1. Белый фон (самый нижний)
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, displayWidth, displayHeight);
 
-      // 2. Пользовательское изображение
+      // 2. Фоновое изображение
+      if (images.bg) {
+        ctx.drawImage(images.bg, 0, 0, displayWidth, displayHeight);
+      }
+
+      // 3. Пользовательское изображение (посередине, двигается)
       if (images.user && transform.width > 0) {
         ctx.save();
         ctx.drawImage(
@@ -280,12 +283,8 @@ const SimplePhotoEditor = forwardRef(
         );
         ctx.restore();
       }
-      // 1. Фон
-      if (images.bg) {
-        ctx.drawImage(images.bg, 0, 0, displayWidth, displayHeight);
-      }
 
-      // 3. Обложка
+      // 4. Обложка (сверху всех, статична)
       if (shouldRenderCover && images.cover) {
         ctx.drawImage(images.cover, 0, 0, displayWidth, displayHeight);
       }
@@ -587,11 +586,18 @@ const SimplePhotoEditor = forwardRef(
         const scaleX = 1920 / stageDimensions.width;
         const scaleY = 1080 / stageDimensions.height;
 
-        // Белый фон
+        // ПРАВИЛЬНЫЙ ПОРЯДОК СЛОЕВ ПРИ ЭКСПОРТЕ:
+
+        // 1. Белый фон
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, 1920, 1080);
 
-        // 2. Пользовательское изображение в высоком качестве
+        // 2. Фон в высоком качестве
+        if (images.bg) {
+          ctx.drawImage(images.bg, 0, 0, 1920, 1080);
+        }
+
+        // 3. Пользовательское изображение в высоком качестве
         if (images.user && imageTransform.width > 0) {
           ctx.save();
           ctx.drawImage(
@@ -603,12 +609,8 @@ const SimplePhotoEditor = forwardRef(
           );
           ctx.restore();
         }
-        // 1. Фон в высоком качестве
-        if (images.bg) {
-          ctx.drawImage(images.bg, 0, 0, 1920, 1080);
-        }
 
-        // 3. Обложка в высоком качестве
+        // 4. Обложка в высоком качестве (если не экспортируем)
         if (shouldRenderCover && images.cover) {
           ctx.drawImage(images.cover, 0, 0, 1920, 1080);
         }
