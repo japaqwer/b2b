@@ -28,6 +28,9 @@ const SimplePhotoEditor = forwardRef(
     const canvasRef = useRef(null);
     const animationFrameRef = useRef(null);
 
+    // Коэффициент масштабирования для высокого качества
+    const QUALITY_SCALE = 3; // 3x разрешение для редактирования
+
     const [stageDimensions, setStageDimensions] = useState({
       width: 640,
       height: 360,
@@ -113,7 +116,6 @@ const SimplePhotoEditor = forwardRef(
         }
       };
 
-      // Добавляем обработчики на контейнер
       const container = containerRef.current;
       if (container) {
         container.addEventListener("touchstart", preventDefault, {
@@ -136,7 +138,7 @@ const SimplePhotoEditor = forwardRef(
       };
     }, []);
 
-    // Загрузка изображений
+    // Загрузка изображений в высоком качестве
     useEffect(() => {
       const loadImage = (src) => {
         return new Promise((resolve) => {
@@ -173,7 +175,7 @@ const SimplePhotoEditor = forwardRef(
       });
     }, [userImage, bgImage, coverImage]);
 
-    // Позиционируем пользовательское изображение (как в Konva)
+    // Позиционируем пользовательское изображение
     useEffect(() => {
       if (images.user && stageDimensions.width && stageDimensions.height) {
         const imgWidth = images.user.width;
@@ -198,21 +200,37 @@ const SimplePhotoEditor = forwardRef(
       }
     }, [images.user, stageDimensions]);
 
-    // Отрисовка canvas
+    // Отрисовка canvas в высоком качестве
     const drawCanvas = () => {
       if (!canvasRef.current) return;
 
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", {
+        alpha: false,
+        desynchronized: true,
+      });
 
-      canvas.width = stageDimensions.width;
-      canvas.height = stageDimensions.height;
+      // Устанавливаем высокое разрешение для canvas
+      const displayWidth = stageDimensions.width;
+      const displayHeight = stageDimensions.height;
 
-      // Очистка - белый фон
+      canvas.width = displayWidth * QUALITY_SCALE;
+      canvas.height = displayHeight * QUALITY_SCALE;
+
+      // Включаем сглаживание для лучшего качества
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+
+      // Масштабируем контекст для высокого разрешения
+      ctx.scale(QUALITY_SCALE, QUALITY_SCALE);
+
+      // Белый фон
       ctx.fillStyle = "#FFFFFF";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, displayWidth, displayHeight);
 
-      // 2. Пользовательское изображение (z-index: 0 - выше фона)
+      // 1. Фон (если есть) - высокое качество
+
+      // 2. Пользовательское изображение - высокое качество
       if (images.user && imageTransform.width > 0) {
         ctx.save();
         ctx.drawImage(
@@ -224,14 +242,13 @@ const SimplePhotoEditor = forwardRef(
         );
         ctx.restore();
       }
-
-      // 1. Фон (если есть)
       if (images.bg) {
-        ctx.drawImage(images.bg, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(images.bg, 0, 0, displayWidth, displayHeight);
       }
-      // 3. Обложка (z-index: 1 - самый верх)
+
+      // 3. Обложка - высокое качество
       if (shouldRenderCover && images.cover) {
-        ctx.drawImage(images.cover, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(images.cover, 0, 0, displayWidth, displayHeight);
       }
     };
 
@@ -251,15 +268,24 @@ const SimplePhotoEditor = forwardRef(
       };
     };
 
+    // Получение координат с учетом масштаба canvas
+    const getCanvasCoordinates = (clientX, clientY) => {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const scaleX = stageDimensions.width / rect.width;
+      const scaleY = stageDimensions.height / rect.height;
+
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY,
+      };
+    };
+
     // Обработчики мыши для перетаскивания
     const handleMouseDown = (e) => {
       if (!images.user) return;
 
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const { x, y } = getCanvasCoordinates(e.clientX, e.clientY);
 
-      // Проверяем, попали ли в область изображения
       const imgLeft = imageTransform.x;
       const imgTop = imageTransform.y;
       const imgRight = imgLeft + imageTransform.width * imageTransform.scaleX;
@@ -278,9 +304,7 @@ const SimplePhotoEditor = forwardRef(
     const handleMouseMove = (e) => {
       if (!isDragging.current) return;
 
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const { x, y } = getCanvasCoordinates(e.clientX, e.clientY);
 
       setImageTransform((prev) => ({
         ...prev,
@@ -308,9 +332,10 @@ const SimplePhotoEditor = forwardRef(
       if (!images.user) return;
 
       const scaleBy = 1.05;
-      const rect = canvasRef.current.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      const { x: mouseX, y: mouseY } = getCanvasCoordinates(
+        e.clientX,
+        e.clientY
+      );
 
       const oldScaleX = imageTransform.scaleX;
 
@@ -320,9 +345,7 @@ const SimplePhotoEditor = forwardRef(
       };
 
       const newScale = e.deltaY < 0 ? oldScaleX * scaleBy : oldScaleX / scaleBy;
-
-      // Убираем минимальное ограничение, оставляем только максимальное
-      const clampedScale = Math.min(newScale, 10);
+      const clampedScale = Math.max(0.1, Math.min(newScale, 10));
 
       setImageTransform((prev) => ({
         ...prev,
@@ -349,24 +372,15 @@ const SimplePhotoEditor = forwardRef(
         // Pinch zoom
         isPinching.current = true;
 
-        const rect = canvasRef.current.getBoundingClientRect();
-        const p1 = {
-          x: touch1.clientX - rect.left,
-          y: touch1.clientY - rect.top,
-        };
-        const p2 = {
-          x: touch2.clientX - rect.left,
-          y: touch2.clientY - rect.top,
-        };
+        const p1 = getCanvasCoordinates(touch1.clientX, touch1.clientY);
+        const p2 = getCanvasCoordinates(touch2.clientX, touch2.clientY);
 
         lastCenter.current = getCenter(p1, p2);
         lastDist.current = getDistance(p1, p2);
       } else if (touch1) {
         // Single touch drag
         isPinching.current = false;
-        const rect = canvasRef.current.getBoundingClientRect();
-        const x = touch1.clientX - rect.left;
-        const y = touch1.clientY - rect.top;
+        const { x, y } = getCanvasCoordinates(touch1.clientX, touch1.clientY);
 
         const imgLeft = imageTransform.x;
         const imgTop = imageTransform.y;
@@ -393,15 +407,8 @@ const SimplePhotoEditor = forwardRef(
 
       if (touch1 && touch2 && isPinching.current) {
         // Pinch zoom
-        const rect = canvasRef.current.getBoundingClientRect();
-        const p1 = {
-          x: touch1.clientX - rect.left,
-          y: touch1.clientY - rect.top,
-        };
-        const p2 = {
-          x: touch2.clientX - rect.left,
-          y: touch2.clientY - rect.top,
-        };
+        const p1 = getCanvasCoordinates(touch1.clientX, touch1.clientY);
+        const p2 = getCanvasCoordinates(touch2.clientX, touch2.clientY);
 
         const newCenter = getCenter(p1, p2);
         const dist = getDistance(p1, p2);
@@ -418,9 +425,7 @@ const SimplePhotoEditor = forwardRef(
         };
 
         const scale = imageTransform.scaleX * (dist / lastDist.current);
-
-        // Убираем минимальное ограничение, оставляем только максимальное
-        const clampedScale = Math.min(scale, 10);
+        const clampedScale = Math.max(0.1, Math.min(scale, 10));
 
         const dx = newCenter.x - lastCenter.current.x;
         const dy = newCenter.y - lastCenter.current.y;
@@ -437,9 +442,7 @@ const SimplePhotoEditor = forwardRef(
         lastCenter.current = newCenter;
       } else if (touch1 && isDragging.current && !isPinching.current) {
         // Single touch drag
-        const rect = canvasRef.current.getBoundingClientRect();
-        const x = touch1.clientX - rect.left;
-        const y = touch1.clientY - rect.top;
+        const { x, y } = getCanvasCoordinates(touch1.clientX, touch1.clientY);
 
         setImageTransform((prev) => ({
           ...prev,
@@ -490,13 +493,19 @@ const SimplePhotoEditor = forwardRef(
       }
     }, [stageDimensions, imageTransform]);
 
-    // Метод экспорта в высоком разрешении
+    // Метод экспорта в высоком разрешении (1920x1080)
     const exportHighRes = async () => {
       return new Promise((resolve) => {
         const exportCanvas = document.createElement("canvas");
         exportCanvas.width = 1920;
         exportCanvas.height = 1080;
-        const ctx = exportCanvas.getContext("2d");
+        const ctx = exportCanvas.getContext("2d", {
+          alpha: false,
+        });
+
+        // Максимальное качество для экспорта
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
 
         const scaleX = 1920 / stageDimensions.width;
         const scaleY = 1080 / stageDimensions.height;
@@ -505,7 +514,9 @@ const SimplePhotoEditor = forwardRef(
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, 1920, 1080);
 
-        // 1. Пользовательское изображение (z-index: 0)
+        // 1. Фон в высоком качестве
+
+        // 2. Пользовательское изображение в высоком качестве
         if (images.user && imageTransform.width > 0) {
           ctx.save();
           ctx.drawImage(
@@ -518,12 +529,11 @@ const SimplePhotoEditor = forwardRef(
           ctx.restore();
         }
 
-        // 2. Фон (если есть)
         if (images.bg) {
           ctx.drawImage(images.bg, 0, 0, 1920, 1080);
         }
 
-        // 3. Обложка (z-index: 1 - если не экспортируем с ней)
+        // 3. Обложка в высоком качестве
         if (shouldRenderCover && images.cover) {
           ctx.drawImage(images.cover, 0, 0, 1920, 1080);
         }
@@ -559,6 +569,7 @@ const SimplePhotoEditor = forwardRef(
             height: "100%",
             cursor: images.user ? "grab" : "default",
             touchAction: "none",
+            imageRendering: "high-quality",
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
