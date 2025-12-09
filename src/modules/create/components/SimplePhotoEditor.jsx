@@ -266,11 +266,6 @@ const SimplePhotoEditor = forwardRef(
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, displayWidth, displayHeight);
 
-      // 2. Фоновое изображение
-      if (images.bg) {
-        ctx.drawImage(images.bg, 0, 0, displayWidth, displayHeight);
-      }
-
       // 3. Пользовательское изображение (посередине, двигается)
       if (images.user && transform.width > 0) {
         ctx.save();
@@ -282,6 +277,10 @@ const SimplePhotoEditor = forwardRef(
           transform.height * transform.scaleY
         );
         ctx.restore();
+      }
+      // 2. Фоновое изображение
+      if (images.bg) {
+        ctx.drawImage(images.bg, 0, 0, displayWidth, displayHeight);
       }
 
       // 4. Обложка (сверху всех, статична)
@@ -593,9 +592,6 @@ const SimplePhotoEditor = forwardRef(
         ctx.fillRect(0, 0, 1920, 1080);
 
         // 2. Фон в высоком качестве
-        if (images.bg) {
-          ctx.drawImage(images.bg, 0, 0, 1920, 1080);
-        }
 
         // 3. Пользовательское изображение в высоком качестве
         if (images.user && imageTransform.width > 0) {
@@ -608,6 +604,9 @@ const SimplePhotoEditor = forwardRef(
             imageTransform.height * imageTransform.scaleY * scaleY
           );
           ctx.restore();
+        }
+        if (images.bg) {
+          ctx.drawImage(images.bg, 0, 0, 1920, 1080);
         }
 
         // 4. Обложка в высоком качестве (если не экспортируем)
