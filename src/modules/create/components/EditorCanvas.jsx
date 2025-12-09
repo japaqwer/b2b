@@ -27,14 +27,14 @@ export function EditorCanvas({ inputSrc, onCreate, template }) {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (mounted && !inputSrc && !userImage) {
-      const timer = setTimeout(() => {
-        fileInputRef.current?.click();
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [mounted, inputSrc, userImage]);
+  // useEffect(() => {
+  //   if (mounted && !inputSrc && !userImage) {
+  //     const timer = setTimeout(() => {
+  //       fileInputRef.current?.click();
+  //     }, 300);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [mounted, inputSrc, userImage]);
 
   useEffect(() => {
     if (!inputSrc) return;
