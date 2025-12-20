@@ -30,15 +30,15 @@ export function SplashEditor({ template, onCreate }) {
       let newScaleFactor = 1;
 
       if (width <= 360) {
-        newScaleFactor = 0.5; // 16px от базовых 32px
+        newScaleFactor = 0.4;
       } else if (width <= 480) {
-        newScaleFactor = 0.5; // 18px
+        newScaleFactor = 0.5;
       } else if (width <= 768) {
-        newScaleFactor = 0.5; // 22px
+        newScaleFactor = 0.6;
       } else if (width <= 1024) {
-        newScaleFactor = 0.8125; // 26px
+        newScaleFactor = 0.8;
       } else {
-        newScaleFactor = 1; // 32px
+        newScaleFactor = 1;
       }
 
       setScaleFactor(newScaleFactor);
@@ -59,12 +59,26 @@ export function SplashEditor({ template, onCreate }) {
           const fs = BASE_FONT_SIZE;
           const { width, height } = measureTextSize(`${template.title}`, fs);
           const id = Date.now();
+
+          // Центрируем текст с учетом границ
+          const safeX = Math.max(
+            0,
+            Math.min((wrap.clientWidth - width) / 2, wrap.clientWidth - width)
+          );
+          const safeY = Math.max(
+            0,
+            Math.min(
+              (wrap.clientHeight - height) / 2,
+              wrap.clientHeight - height
+            )
+          );
+
           setTexts([
             {
               id,
               text: `${template.title}`,
-              x: (wrap.clientWidth - width) / 2,
-              y: (wrap.clientHeight - height) / 2,
+              x: safeX,
+              y: safeY,
               fontSize: fs,
               width,
               height,
@@ -83,12 +97,25 @@ export function SplashEditor({ template, onCreate }) {
       setTexts((prev) =>
         prev.map((t) => {
           const { width, height } = measureTextSize(t.text, t.fontSize);
+
+          // Ограничиваем позицию текста в пределах контейнера
+          const maxX = Math.max(0, wrap.clientWidth - width);
+          const maxY = Math.max(0, wrap.clientHeight - height);
+          const safeX = Math.max(
+            0,
+            Math.min((wrap.clientWidth - width) / 2, maxX)
+          );
+          const safeY = Math.max(
+            0,
+            Math.min((wrap.clientHeight - height) / 2, maxY)
+          );
+
           return {
             ...t,
             width,
             height,
-            x: (wrap.clientWidth - width) / 2,
-            y: (wrap.clientHeight - height) / 2,
+            x: safeX,
+            y: safeY,
           };
         })
       );
@@ -104,9 +131,14 @@ export function SplashEditor({ template, onCreate }) {
     const baseLineHeight = 38;
     const lineHeight = baseLineHeight * scaleFactor;
 
+    // Учитываем максимальную ширину контейнера
+    const maxContainerWidth = wrapperRef.current
+      ? wrapperRef.current.clientWidth * 0.9
+      : CANVAS_WIDTH * 0.9;
+
     const widths = lines.map((line) => {
       const measured = ctx.measureText(line || " ");
-      return measured.width + 32 * scaleFactor;
+      return Math.min(measured.width + 32 * scaleFactor, maxContainerWidth);
     });
 
     const maxWidth = Math.max(...widths, 120 * scaleFactor);
@@ -125,14 +157,20 @@ export function SplashEditor({ template, onCreate }) {
     const fs = BASE_FONT_SIZE;
     const { width, height } = measureTextSize(val || " ", fs);
 
+    // Ограничиваем позицию при изменении текста
+    const maxX = Math.max(0, wrap.clientWidth - width);
+    const maxY = Math.max(0, wrap.clientHeight - height);
+    const safeX = Math.max(0, Math.min((wrap.clientWidth - width) / 2, maxX));
+    const safeY = Math.max(0, Math.min((wrap.clientHeight - height) / 2, maxY));
+
     if (editingTextId == null) {
       const id = Date.now();
       setTexts([
         {
           id,
           text: val,
-          x: (wrap.clientWidth - width) / 2,
-          y: (wrap.clientHeight - height) / 2,
+          x: safeX,
+          y: safeY,
           fontSize: fs,
           width,
           height,
@@ -149,8 +187,8 @@ export function SplashEditor({ template, onCreate }) {
             fontSize: fs,
             width,
             height,
-            x: (wrap.clientWidth - width) / 2,
-            y: (wrap.clientHeight - height) / 2,
+            x: safeX,
+            y: safeY,
           };
         })
       );
@@ -227,7 +265,12 @@ export function SplashEditor({ template, onCreate }) {
           <img
             src={template?.intro}
             alt="background"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
           />
           <div
             ref={textRef}
@@ -235,19 +278,22 @@ export function SplashEditor({ template, onCreate }) {
               position: "absolute",
               top: 0,
               left: 0,
-              width: "90%",
+              width: "100%",
               height: "100%",
+              pointerEvents: "none",
             }}
           >
             {texts.map((item) => (
-              <Rnd
+              <div
                 key={item.id}
-                bounds="parent"
-                position={{ x: item.x, y: item.y }}
-                size={{ width: item.width, height: item.height }}
-                enableResizing={false}
-                dragAxis="none"
-                style={{ zIndex: 100 }}
+                style={{
+                  position: "absolute",
+                  left: item.x,
+                  top: item.y,
+                  width: item.width,
+                  height: item.height,
+                  zIndex: 100,
+                }}
               >
                 <div className={s.divqwe}>
                   <div
@@ -259,12 +305,13 @@ export function SplashEditor({ template, onCreate }) {
                       whiteSpace: "pre-wrap",
                       wordBreak: "break-word",
                       overflowWrap: "break-word",
+                      maxWidth: "100%",
                     }}
                   >
                     {item.text}
                   </div>
                 </div>
-              </Rnd>
+              </div>
             ))}
           </div>
         </div>
