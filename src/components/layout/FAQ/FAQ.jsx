@@ -16,6 +16,15 @@ export default function FAQ() {
         >
           <FaTelegramPlane size={40} />
         </Link>
+        <Link
+          href={
+            "https://max.ru/u/f9LHodD0cOIvvBc324-X595C6YvIndV9z_druzO6stb6rcfIXFRqqsgvttU"
+          }
+          target="_blank"
+          className={s.tel}
+        >
+          <img src="/assets/images/MAX logo.png" alt="max" />
+        </Link>
       </div>
     </div>
   );

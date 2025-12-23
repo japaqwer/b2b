@@ -73,7 +73,15 @@ export default function OrderPushPage() {
           rel="noopener noreferrer"
           className={s.buttonBlue}
         >
-          Отправить заказ в Телеграм
+          в Телеграм
+        </Link>
+        <Link
+          href={`https://max.ru/u/f9LHodD0cOIvvBc324-X595C6YvIndV9z_druzO6stb6rcfIXFRqqsgvttU`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={s.buttonBlue}
+        >
+          в MAX
         </Link>
       </div>
     </div>
