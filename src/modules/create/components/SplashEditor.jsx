@@ -196,15 +196,23 @@ export function SplashEditor({ template, onCreate }) {
   };
 
   const captureText = async () => {
-    if (!textRef.current) return null;
-    const canvas = await html2canvas(textRef.current, {
-      useCORS: true,
-      backgroundColor: null,
-      scale: 5,
-      logging: false,
-      allowTaint: true,
-    });
-    return canvas.toDataURL("image/png");
+    if (!wrapperRef.current) return null;
+
+    try {
+      const canvas = await html2canvas(wrapperRef.current, {
+        useCORS: true,
+        backgroundColor: null,
+        scale: 2,
+        logging: false,
+        allowTaint: true,
+        width: wrapperRef.current.offsetWidth,
+        height: wrapperRef.current.offsetHeight,
+      });
+      return canvas.toDataURL("image/png");
+    } catch (error) {
+      console.error("Capture error:", error);
+      return null;
+    }
   };
 
   function dataURLtoFile(dataurl, filename) {
