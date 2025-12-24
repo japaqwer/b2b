@@ -112,7 +112,7 @@ export default function PreviewStep({
     localStorageImages.length >= 2 && localStorageImages.length <= 12;
 
   return (
-    <div className="center" style={{ touchAction: "none", marginTop: -30 }}>
+    <div className="center" style={{ touchAction: "none", marginTop: -60 }}>
       <h2 className={s.h2}>Предпросмотр</h2>
       <h3 className={s.h3}>
         Вы загрузили {localStorageImages.length} фото из 36
@@ -150,7 +150,7 @@ export default function PreviewStep({
         </SortableContext>
       </DndContext>
 
-      {showCyclicControls && (
+      {/* {showCyclicControls && (
         <div className="center" style={{ marginTop: 16 }}>
           <p className={s.h411}>
             {cyclic ? "Фото будут повторяться" : "Фото не будут повторяться"}
@@ -163,7 +163,7 @@ export default function PreviewStep({
             {cyclic ? "Отключить повтор" : "Включить повтор"}
           </button>
         </div>
-      )}
+      )} */}
 
       {selectedItem && (
         <div className={s.modalOverlay} onClick={() => setSelectedItem(null)}>
